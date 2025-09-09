@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конструктор диалогов</title>
+    <title>Продвинутый конструктор диалогов</title>
     <style>
         * {
             margin: 0;
@@ -12,24 +12,45 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
 
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+        }
+
         .preview-area {
             position: relative;
-            height: 400px;
+            height: 45%;
             background-size: cover;
             background-position: center;
             border-bottom: 3px solid #333;
@@ -40,8 +61,9 @@
         .character {
             position: absolute;
             bottom: 0;
-            height: 350px;
+            height: 85%;
             transition: all 0.3s ease;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
         }
 
         .character-left {
@@ -56,16 +78,18 @@
             position: absolute;
             bottom: 20px;
             background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
+            padding: 15px 20px;
+            border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             max-width: 400px;
-            min-height: 80px;
+            min-height: 70px;
             display: flex;
             align-items: center;
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s ease;
+            font-size: 16px;
+            line-height: 1.4;
         }
 
         .dialog-box.active {
@@ -75,10 +99,175 @@
 
         .dialog-box-left {
             left: 220px;
+            border-left: 5px solid #3498db;
         }
 
         .dialog-box-right {
             right: 220px;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .timeline-container {
+            height: 55%;
+            display: flex;
+            flex-direction: column;
+            background: #ecf0f1;
+            border-top: 2px solid #bdc3c7;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #34495e;
+            color: white;
+        }
+
+        .timeline-controls button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .timeline-controls button:hover {
+            background: #2980b9;
+        }
+
+        .timeline {
+            flex: 1;
+            background: #2c3e50;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ruler {
+            height: 30px;
+            background: #34495e;
+            border-bottom: 1px solid #7f8c8d;
+            position: relative;
+        }
+
+        .time-marker {
+            position: absolute;
+            height: 100%;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.3);
+            top: 0;
+        }
+
+        .time-marker span {
+            position: absolute;
+            top: 5px;
+            left: 2px;
+            color: white;
+            font-size: 10px;
+        }
+
+        .tracks {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 30px);
+        }
+
+        .track {
+            display: flex;
+            height: 80px;
+            border-bottom: 1px solid #7f8c8d;
+            position: relative;
+        }
+
+        .track-label {
+            width: 120px;
+            background: #34495e;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .track-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clip {
+            position: absolute;
+            height: 70px;
+            top: 5px;
+            border-radius: 5px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease;
+            user-select: none;
+        }
+
+        .clip:active {
+            cursor: grabbing;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .dialogue-clip {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+
+        .sfx-clip {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .clip-handle {
+            width: 10px;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            cursor: col-resize;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .clip-handle-left {
+            left: 0;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .clip-handle-right {
+            right: 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .playhead {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: #e74c3c;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .playhead::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -5px;
+            width: 12px;
+            height: 12px;
+            background: #e74c3c;
+            border-radius: 50%;
         }
 
         .controls {
@@ -97,9 +286,11 @@
         }
 
         h2 {
-            color: #333;
+            color: #2c3e50;
             margin-bottom: 15px;
             font-size: 1.2em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
         }
 
         select, input, textarea, button {
@@ -112,7 +303,7 @@
         }
 
         button {
-            background: #667eea;
+            background: #3498db;
             color: white;
             border: none;
             padding: 12px;
@@ -122,38 +313,33 @@
         }
 
         button:hover {
-            background: #5a67d8;
+            background: #2980b9;
         }
 
-        .dialogue-controls {
+        .slider-container {
             display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        .dialogue-controls button {
-            flex: 1;
+        .slider-container label {
+            min-width: 80px;
         }
 
-        #playBtn {
-            background: #48bb78;
+        input[type="range"] {
+            margin: 0;
         }
 
-        #playBtn:hover {
-            background: #38a169;
-        }
-
-        #resetBtn {
-            background: #f56565;
-        }
-
-        #resetBtn:hover {
-            background: #e53e3e;
+        .voice-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         .current-step {
             text-align: center;
             padding: 10px;
-            background: #667eea;
+            background: #3498db;
             color: white;
             font-weight: bold;
         }
@@ -162,24 +348,81 @@
             min-height: 80px;
             resize: vertical;
         }
+
+        .clip-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .mini-btn {
+            padding: 5px;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        /* Анимация воспроизведения */
+        @keyframes playing {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .playing {
+            animation: playing 0.5s infinite;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="current-step" id="currentStep">Нажмите на экран для продолжения</div>
-        
-        <div class="preview-area" id="previewArea">
-            <img class="character character-left" id="characterLeft" src="" alt="Персонаж слева">
-            <img class="character character-right" id="characterRight" src="" alt="Персонаж справа">
-            
-            <div class="dialog-box dialog-box-left" id="dialogLeft">
-                <div class="dialog-text"></div>
+        <header>
+            <div class="logo">🎬 Конструктор диалогов PRO</div>
+            <div class="timeline-controls">
+                <button id="playBtn">▶ Воспроизвести</button>
+                <button id="pauseBtn">⏸ Пауза</button>
+                <button id="stopBtn">⏹ Стоп</button>
+                <button id="exportBtn">💾 Экспорт</button>
             </div>
-            
-            <div class="dialog-box dialog-box-right" id="dialogRight">
-                <div class="dialog-text"></div>
+        </header>
+        
+        <div class="main-content">
+            <div class="preview-area" id="previewArea">
+                <img class="character character-left" id="characterLeft" src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400" alt="Персонаж слева">
+                <img class="character character-right" id="characterRight" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400" alt="Персонаж справа">
+                
+                <div class="dialog-box dialog-box-left" id="dialogLeft">
+                    <div class="dialog-text"></div>
+                </div>
+                
+                <div class="dialog-box dialog-box-right" id="dialogRight">
+                    <div class="dialog-text"></div>
+                </div>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <div>Таймлайн</div>
+                    <div>Масштаб: <input type="range" id="zoomSlider" min="1" max="100" value="10"></div>
+                </div>
+                <div class="timeline">
+                    <div class="ruler" id="ruler"></div>
+                    <div class="tracks">
+                        <div class="track">
+                            <div class="track-label">Диалоги</div>
+                            <div class="track-content" id="dialogueTrack"></div>
+                        </div>
+                        <div class="track">
+                            <div class="track-label">Звуковые эффекты</div>
+                            <div class="track-content" id="sfxTrack"></div>
+                        </div>
+                    </div>
+                    <div class="playhead" id="playhead"></div>
+                </div>
             </div>
         </div>
+
+        <div class="current-step" id="currentStep">Готов к работе. Добавьте элементы на таймлайн.</div>
 
         <div class="controls">
             <div class="control-group">
@@ -188,6 +431,7 @@
                     <option value="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800">Горы</option>
                     <option value="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800">Леса</option>
                     <option value="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800">Океан</option>
+                    <option value="https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=800">Город</option>
                 </select>
             </div>
 
@@ -210,22 +454,64 @@
             </div>
 
             <div class="control-group">
-                <h2>Речь персонажа слева</h2>
-                <textarea class="speech-input" id="leftSpeech" placeholder="Введите реплику для левого персонажа..."></textarea>
-                <button onclick="addDialogue('left')">Добавить реплику слева</button>
+                <h2>Добавить диалог</h2>
+                <select id="dialogueCharacter">
+                    <option value="left">Персонаж слева</option>
+                    <option value="right">Персонаж справа</option>
+                </select>
+                <textarea class="speech-input" id="dialogueText" placeholder="Введите текст реплики..."></textarea>
+                
+                <div class="voice-options">
+                    <div>
+                        <label>Голос</label>
+                        <select id="voiceSelect"></select>
+                    </div>
+                    <div>
+                        <label>Скорость</label>
+                        <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
+                    </div>
+                    <div>
+                        <label>Высота</label>
+                        <input type="range" id="pitchSlider" min="0.5" max="2" step="0.1" value="1">
+                    </div>
+                    <div>
+                        <label>Громкость</label>
+                        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
+                    </div>
+                </div>
+                
+                <button id="addDialogueBtn">➕ Добавить на таймлайн</button>
             </div>
 
             <div class="control-group">
-                <h2>Речь персонажа справа</h2>
-                <textarea class="speech-input" id="rightSpeech" placeholder="Введите реплику для правого персонажа..."></textarea>
-                <button onclick="addDialogue('right')">Добавить реплику справа</button>
+                <h2>Звуковые эффекты</h2>
+                <select id="sfxSelect">
+                    <option value="bell">Колокольчик</option>
+                    <option value="drum">Барабанная дробь</option>
+                    <option value="applause">Аплодисменты</option>
+                    <option value="laugh">Смех</option>
+                    <option value="suspense">Напряжение</option>
+                </select>
+                
+                <div class="slider-container">
+                    <label>Громкость:</label>
+                    <input type="range" id="sfxVolume" min="0" max="1" step="0.1" value="0.7">
+                </div>
+                
+                <button id="addSfxBtn">🔊 Добавить эффект</button>
             </div>
 
             <div class="control-group">
-                <h2>Управление диалогом</h2>
-                <div class="dialogue-controls">
-                    <button id="playBtn" onclick="startDialogue()">▶ Воспроизвести</button>
-                    <button id="resetBtn" onclick="resetDialogue()">↺ Сбросить</button>
+                <h2>Управление проектом</h2>
+                <button id="saveBtn">💾 Сохранить проект</button>
+                <button id="loadBtn">📂 Загрузить проект</button>
+                <button id="resetBtn">🗑️ Новый проект</button>
+                
+                <div class="clip-controls">
+                    <h3>Выбранный элемент:</h3>
+                    <div id="clipInfo">Нет выбранного элемента</div>
+                    <button class="mini-btn" id="deleteClipBtn">Удалить элемент</button>
+                    <button class="mini-btn" id="duplicateClipBtn">Дублировать</button>
                 </div>
             </div>
         </div>
@@ -241,29 +527,81 @@
         const backgroundSelect = document.getElementById('backgroundSelect');
         const leftCharacterSelect = document.getElementById('leftCharacterSelect');
         const rightCharacterSelect = document.getElementById('rightCharacterSelect');
-        const leftSpeech = document.getElementById('leftSpeech');
-        const rightSpeech = document.getElementById('rightSpeech');
+        const dialogueText = document.getElementById('dialogueText');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const rateSlider = document.getElementById('rateSlider');
+        const pitchSlider = document.getElementById('pitchSlider');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const addDialogueBtn = document.getElementById('addDialogueBtn');
+        const sfxSelect = document.getElementById('sfxSelect');
+        const sfxVolume = document.getElementById('sfxVolume');
+        const addSfxBtn = document.getElementById('addSfxBtn');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const deleteClipBtn = document.getElementById('deleteClipBtn');
+        const duplicateClipBtn = document.getElementById('duplicateClipBtn');
+        const zoomSlider = document.getElementById('zoomSlider');
+        const ruler = document.getElementById('ruler');
+        const dialogueTrack = document.getElementById('dialogueTrack');
+        const sfxTrack = document.getElementById('sfxTrack');
+        const playhead = document.getElementById('playhead');
         const currentStep = document.getElementById('currentStep');
+        const dialogueCharacter = document.getElementById('dialogueCharacter');
+        const clipInfo = document.getElementById('clipInfo');
 
         // Данные приложения
-        let dialogue = [];
-        let currentDialogueIndex = 0;
-        let isDialogueActive = false;
+        let project = {
+            dialogues: [],
+            sfx: [],
+            duration: 60, // seconds
+            zoom: 10
+        };
+        
+        let voices = [];
+        let isPlaying = false;
+        let playheadPosition = 0;
+        let playbackInterval;
+        let selectedClip = null;
+        let currentAudio = null;
 
         // Инициализация
         function init() {
             updateBackground();
-            updateCharacters();
+            updateCharacter('left');
+            updateCharacter('right');
+            loadVoices();
+            drawRuler();
             
             // Обработчики событий
             backgroundSelect.addEventListener('change', updateBackground);
             leftCharacterSelect.addEventListener('change', () => updateCharacter('left'));
             rightCharacterSelect.addEventListener('change', () => updateCharacter('right'));
-            previewArea.addEventListener('click', handleScreenClick);
+            addDialogueBtn.addEventListener('click', addDialogueToTimeline);
+            addSfxBtn.addEventListener('click', addSfxToTimeline);
+            playBtn.addEventListener('click', playTimeline);
+            pauseBtn.addEventListener('click', pauseTimeline);
+            stopBtn.addEventListener('click', stopTimeline);
+            exportBtn.addEventListener('click', exportProject);
+            saveBtn.addEventListener('click', saveProject);
+            loadBtn.addEventListener('click', loadProject);
+            resetBtn.addEventListener('click', resetProject);
+            deleteClipBtn.addEventListener('click', deleteSelectedClip);
+            duplicateClipBtn.addEventListener('click', duplicateSelectedClip);
+            zoomSlider.addEventListener('input', updateZoom);
             
-            // Загрузка изображений по умолчанию
-            characterLeft.src = leftCharacterSelect.value;
-            characterRight.src = rightCharacterSelect.value;
+            // Загрузка голосов
+            speechSynthesis.addEventListener('voiceschanged', loadVoices);
+            
+            // Инициализация аудио контекста
+            initAudioContext();
+            
+            // Настройка кнопок
+            pauseBtn.disabled = true;
         }
 
         // Обновление фона
@@ -272,11 +610,6 @@
         }
 
         // Обновление персонажей
-        function updateCharacters() {
-            characterLeft.src = leftCharacterSelect.value;
-            characterRight.src = rightCharacterSelect.value;
-        }
-
         function updateCharacter(side) {
             if (side === 'left') {
                 characterLeft.src = leftCharacterSelect.value;
@@ -285,99 +618,482 @@
             }
         }
 
-        // Добавление реплики в диалог
-        function addDialogue(side) {
-            const text = side === 'left' ? leftSpeech.value : rightSpeech.value;
-            if (text.trim()) {
-                dialogue.push({ side, text });
-                alert(`Реплика добавлена! Всего реплик: ${dialogue.length}`);
-                if (side === 'left') leftSpeech.value = '';
-                else rightSpeech.value = '';
+        // Загрузка доступных голосов
+        function loadVoices() {
+            voices = speechSynthesis.getVoices();
+            voiceSelect.innerHTML = '';
+            
+            // Фильтруем голоса, поддерживающие русский язык
+            const russianVoices = voices.filter(voice => 
+                voice.lang.includes('ru') || voice.lang.includes('RU'));
+            
+            if (russianVoices.length === 0) {
+                // Если нет русских голосов, показываем все доступные
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
             } else {
-                alert('Введите текст реплики!');
+                russianVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
             }
         }
 
-        // Воспроизведение диалога
-        function startDialogue() {
-            if (dialogue.length === 0) {
-                alert('Добавьте хотя бы одну реплику!');
+        // Отрисовка линейки времени
+        function drawRuler() {
+            ruler.innerHTML = '';
+            const seconds = project.duration;
+            const zoom = project.zoom;
+            
+            for (let i = 0; i <= seconds; i++) {
+                if (i % 5 === 0) {
+                    const marker = document.createElement('div');
+                    marker.className = 'time-marker';
+                    marker.style.left = `${i * zoom}px`;
+                    
+                    const label = document.createElement('span');
+                    label.textContent = `${i}s`;
+                    marker.appendChild(label);
+                    
+                    ruler.appendChild(marker);
+                }
+            }
+        }
+
+        // Добавление диалога на таймлайн
+        function addDialogueToTimeline() {
+            const text = dialogueText.value.trim();
+            if (!text) {
+                alert('Введите текст реплики!');
                 return;
             }
             
-            isDialogueActive = true;
-            currentDialogueIndex = 0;
-            showCurrentDialogue();
+            const dialogue = {
+                id: Date.now(),
+                type: 'dialogue',
+                character: dialogueCharacter.value,
+                text: text,
+                voice: voiceSelect.value,
+                rate: parseFloat(rateSlider.value),
+                pitch: parseFloat(pitchSlider.value),
+                volume: parseFloat(volumeSlider.value),
+                start: findEmptySpace(),
+                duration: Math.max(3, text.length / 5), // Длительность based on text length
+                position: 0
+            };
+            
+            project.dialogues.push(dialogue);
+            renderDialogueClip(dialogue);
+            dialogueText.value = '';
         }
 
-        // Обработчик клика по экрану
-        function handleScreenClick() {
-            if (!isDialogueActive) return;
+        // Поиск свободного места на таймлайне
+        function findEmptySpace() {
+            // Простая реализация - ищем после последнего элемента
+            let maxEnd = 0;
             
-            currentDialogueIndex++;
-            if (currentDialogueIndex < dialogue.length) {
-                showCurrentDialogue();
+            project.dialogues.forEach(dialogue => {
+                maxEnd = Math.max(maxEnd, dialogue.start + dialogue.duration);
+            });
+            
+            project.sfx.forEach(sfx => {
+                maxEnd = Math.max(maxEnd, sfx.start + sfx.duration);
+            });
+            
+            return maxEnd + 1; // Добавляем 1 секунду отступа
+        }
+
+        // Добавление звукового эффекта
+        function addSfxToTimeline() {
+            const sfx = {
+                id: Date.now(),
+                type: 'sfx',
+                effect: sfxSelect.value,
+                volume: parseFloat(sfxVolume.value),
+                start: findEmptySpace(),
+                duration: 3,
+                position: 0
+            };
+            
+            project.sfx.push(sfx);
+            renderSfxClip(sfx);
+        }
+
+        // Отрисовка клипа диалога
+        function renderDialogueClip(dialogue) {
+            const clip = document.createElement('div');
+            clip.className = 'clip dialogue-clip';
+            clip.id = `clip-${dialogue.id}`;
+            clip.style.left = `${dialogue.start * project.zoom}px`;
+            clip.style.width = `${dialogue.duration * project.zoom}px`;
+            
+            clip.innerHTML = `
+                <div class="clip-handle clip-handle-left"></div>
+                <div class="clip-content">${dialogue.character === 'left' ? '👈' : '👉'} ${dialogue.text.substring(0, 20)}${dialogue.text.length > 20 ? '...' : ''}</div>
+                <div class="clip-handle clip-handle-right"></div>
+            `;
+            
+            // Обработчики для перетаскивания
+            makeClipDraggable(clip, dialogue);
+            
+            dialogueTrack.appendChild(clip);
+        }
+
+        // Отрисовка клипа звукового эффекта
+        function renderSfxClip(sfx) {
+            const clip = document.createElement('div');
+            clip.className = 'clip sfx-clip';
+            clip.id = `sfx-${sfx.id}`;
+            clip.style.left = `${sfx.start * project.zoom}px`;
+            clip.style.width = `${sfx.duration * project.zoom}px`;
+            
+            clip.innerHTML = `
+                <div class="clip-handle clip-handle-left"></div>
+                <div class="clip-content">🔊 ${sfx.effect}</div>
+                <div class="clip-handle clip-handle-right"></div>
+            `;
+            
+            // Обработчики для перетаскивания
+            makeClipDraggable(clip, sfx);
+            
+            sfxTrack.appendChild(clip);
+        }
+
+        // Сделать клип перетаскиваемым
+        function makeClipDraggable(clip, item) {
+            clip.addEventListener('mousedown', (e) => {
+                selectedClip = item;
+                updateClipInfo();
+                
+                // Базовая логика перетаскивания
+                const startX = e.clientX;
+                const startLeft = parseInt(clip.style.left);
+                
+                function onMouseMove(e) {
+                    const dx = e.clientX - startX;
+                    const newLeft = Math.max(0, startLeft + dx);
+                    clip.style.left = `${newLeft}px`;
+                    item.start = newLeft / project.zoom;
+                }
+                
+                function onMouseUp() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                e.preventDefault();
+            });
+        }
+
+        // Обновление информации о выбранном клипе
+        function updateClipInfo() {
+            if (!selectedClip) {
+                clipInfo.textContent = 'Нет выбранного элемента';
+                return;
+            }
+            
+            if (selectedClip.type === 'dialogue') {
+                clipInfo.textContent = `Диалог: ${selectedClip.text.substring(0, 30)}...`;
             } else {
-                endDialogue();
+                clipInfo.textContent = `SFX: ${selectedClip.effect}, Громкость: ${selectedClip.volume}`;
             }
         }
 
-        // Показать текущую реплику
-        function showCurrentDialogue() {
-            const current = dialogue[currentDialogueIndex];
+        // Воспроизведение таймлайна
+        function playTimeline() {
+            if (isPlaying) return;
             
+            isPlaying = true;
+            playBtn.disabled = true;
+            pauseBtn.disabled = false;
+            currentStep.textContent = 'Воспроизведение...';
+            
+            let currentTime = playheadPosition;
+            
+            playbackInterval = setInterval(() => {
+                currentTime += 0.1;
+                playheadPosition = currentTime;
+                playhead.style.left = `${currentTime * project.zoom}px`;
+                
+                // Check for dialogues and SFX to play
+                playItemsAtTime(currentTime);
+                
+                if (currentTime >= project.duration) {
+                    stopTimeline();
+                }
+            }, 100);
+        }
+
+        // Воспроизведение элементов в текущее время
+        function playItemsAtTime(time) {
+            // Диалоги
+            project.dialogues.forEach(dialogue => {
+                if (Math.abs(dialogue.start - time) < 0.1) {
+                    playDialogue(dialogue);
+                }
+            });
+            
+            // Звуковые эффекты
+            project.sfx.forEach(sfx => {
+                if (Math.abs(sfx.start - time) < 0.1) {
+                    playSfx(sfx);
+                }
+            });
+        }
+
+        // Воспроизведение диалога
+        function playDialogue(dialogue) {
             // Скрываем все диалоги
             dialogLeft.classList.remove('active');
             dialogRight.classList.remove('active');
             
-            // Показываем нужный диалог
             setTimeout(() => {
-                if (current.side === 'left') {
-                    dialogLeft.querySelector('.dialog-text').textContent = current.text;
+                if (dialogue.character === 'left') {
+                    dialogLeft.querySelector('.dialog-text').textContent = dialogue.text;
                     dialogLeft.classList.add('active');
-                    speakText(current.text);
                 } else {
-                    dialogRight.querySelector('.dialog-text').textContent = current.text;
+                    dialogRight.querySelector('.dialog-text').textContent = dialogue.text;
                     dialogRight.classList.add('active');
-                    speakText(current.text);
                 }
                 
-                currentStep.textContent = `Реплика ${currentDialogueIndex + 1} из ${dialogue.length}`;
+                // Озвучка
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(dialogue.text);
+                    
+                    // Настройки голоса
+                    const voice = voices.find(v => v.name === dialogue.voice);
+                    if (voice) utterance.voice = voice;
+                    
+                    utterance.rate = dialogue.rate;
+                    utterance.pitch = dialogue.pitch;
+                    utterance.volume = dialogue.volume;
+                    
+                    speechSynthesis.speak(utterance);
+                }
             }, 300);
         }
 
-        // Озвучка текста
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ru-RU';
-                utterance.rate = 1.0;
-                speechSynthesis.speak(utterance);
+        // Инициализация аудио контекста
+        function initAudioContext() {
+            try {
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                window.audioContext = new AudioContext();
+            } catch (e) {
+                console.warn('Web Audio API не поддерживается в этом браузере');
             }
         }
 
-        // Завершение диалога
-        function endDialogue() {
-            isDialogueActive = false;
-            dialogLeft.classList.remove('active');
-            dialogRight.classList.remove('active');
-            currentStep.textContent = 'Диалог завершен. Нажмите "Воспроизвести" для повторения.';
-            speechSynthesis.cancel();
+        // Воспроизведение звукового эффекта
+        function playSfx(sfx) {
+            if (!window.audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            switch(sfx.effect) {
+                case 'bell':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 1);
+                    break;
+                case 'drum':
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                    break;
+                case 'applause':
+                    // Имитация аплодисментов
+                    for (let i = 0; i < 5; i++) {
+                        const clap = audioContext.createOscillator();
+                        clap.type = 'sine';
+                        clap.frequency.setValueAtTime(1000 + Math.random() * 500, audioContext.currentTime + i * 0.2);
+                        clap.connect(gainNode);
+                        clap.start(audioContext.currentTime + i * 0.2);
+                        clap.stop(audioContext.currentTime + i * 0.2 + 0.1);
+                    }
+                    break;
+                case 'laugh':
+                    oscillator.type = 'sine';
+                    for (let i = 0; i < 5; i++) {
+                        oscillator.frequency.setValueAtTime(500 + i * 100, audioContext.currentTime + i * 0.2);
+                    }
+                    break;
+                case 'suspense':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 2);
+                    break;
+            }
+            
+            gainNode.gain.value = sfx.volume;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 1);
         }
 
-        // Сброс диалога
-        function resetDialogue() {
-            dialogue = [];
-            currentDialogueIndex = 0;
-            isDialogueActive = false;
+        // Пауза таймлайна
+        function pauseTimeline() {
+            if (!isPlaying) return;
+            
+            isPlaying = false;
+            clearInterval(playbackInterval);
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            currentStep.textContent = 'Пауза';
+            
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+        }
+
+        // Остановка таймлайна
+        function stopTimeline() {
+            isPlaying = false;
+            clearInterval(playbackInterval);
+            playheadPosition = 0;
+            playhead.style.left = '0px';
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            currentStep.textContent = 'Воспроизведение остановлено';
+            
+            // Скрыть диалоги
             dialogLeft.classList.remove('active');
             dialogRight.classList.remove('active');
-            currentStep.textContent = 'Диалог сброшен. Добавьте новые реплики.';
-            speechSynthesis.cancel();
+            
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+        }
+
+        // Обновление масштаба
+        function updateZoom() {
+            project.zoom = parseInt(zoomSlider.value);
+            drawRuler();
+            renderAllClips();
+        }
+
+        // Перерисовка всех клипов
+        function renderAllClips() {
+            // Очистка треков
+            dialogueTrack.innerHTML = '';
+            sfxTrack.innerHTML = '';
+            
+            // Перерисовка диалогов
+            project.dialogues.forEach(dialogue => {
+                renderDialogueClip(dialogue);
+            });
+            
+            // Перерисовка эффектов
+            project.sfx.forEach(sfx => {
+                renderSfxClip(sfx);
+            });
+            
+            // Обновление позиции playhead
+            playhead.style.left = `${playheadPosition * project.zoom}px`;
+        }
+
+        // Удаление выбранного клипа
+        function deleteSelectedClip() {
+            if (!selectedClip) return;
+            
+            if (selectedClip.type === 'dialogue') {
+                project.dialogues = project.dialogues.filter(d => d.id !== selectedClip.id);
+                const clipElement = document.getElementById(`clip-${selectedClip.id}`);
+                if (clipElement) clipElement.remove();
+            } else {
+                project.sfx = project.sfx.filter(s => s.id !== selectedClip.id);
+                const sfxElement = document.getElementById(`sfx-${selectedClip.id}`);
+                if (sfxElement) sfxElement.remove();
+            }
+            
+            selectedClip = null;
+            updateClipInfo();
+        }
+
+        // Дублирование выбранного клипа
+        function duplicateSelectedClip() {
+            if (!selectedClip) return;
+            
+            const duplicate = JSON.parse(JSON.stringify(selectedClip));
+            duplicate.id = Date.now();
+            duplicate.start += 2; // Сдвигаем на 2 секунды
+            
+            if (duplicate.type === 'dialogue') {
+                project.dialogues.push(duplicate);
+                renderDialogueClip(duplicate);
+            } else {
+                project.sfx.push(duplicate);
+                renderSfxClip(duplicate);
+            }
+        }
+
+        // Экспорт проекта
+        function exportProject() {
+            const projectData = JSON.stringify(project, null, 2);
+            const blob = new Blob([projectData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'диалог-проект.json';
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            currentStep.textContent = 'Проект экспортирован!';
+        }
+
+        // Сохранение проекта
+        function saveProject() {
+            localStorage.setItem('dialogueProject', JSON.stringify(project));
+            currentStep.textContent = 'Проект сохранен в localStorage!';
+        }
+
+        // Загрузка проекта
+        function loadProject() {
+            const savedProject = localStorage.getItem('dialogueProject');
+            if (savedProject) {
+                project = JSON.parse(savedProject);
+                renderAllClips();
+                drawRuler();
+                currentStep.textContent = 'Проект загружен из localStorage!';
+            } else {
+                alert('Нет сохраненных проектов');
+            }
+        }
+
+        // Сброс проекта
+        function resetProject() {
+            if (confirm('Вы уверены? Весь прогресс будет потерян.')) {
+                project = {
+                    dialogues: [],
+                    sfx: [],
+                    duration: 60,
+                    zoom: 10
+                };
+                
+                stopTimeline();
+                dialogueTrack.innerHTML = '';
+                sfxTrack.innerHTML = '';
+                selectedClip = null;
+                updateClipInfo();
+                zoomSlider.value = 10;
+                drawRuler();
+                
+                currentStep.textContent = 'Новый проект создан';
+            }
         }
 
         // Запуск приложения
-        init();
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
