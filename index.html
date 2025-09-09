@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор диалогов</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .preview-area {
+            position: relative;
+            height: 400px;
+            background-size: cover;
+            background-position: center;
+            border-bottom: 3px solid #333;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .character {
+            position: absolute;
+            bottom: 0;
+            height: 350px;
+            transition: all 0.3s ease;
+        }
+
+        .character-left {
+            left: 50px;
+        }
+
+        .character-right {
+            right: 50px;
+        }
+
+        .dialog-box {
+            position: absolute;
+            bottom: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .dialog-box.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dialog-box-left {
+            left: 220px;
+        }
+
+        .dialog-box-right {
+            right: 220px;
+        }
+
+        .controls {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            background: #f8f9fa;
+        }
+
+        .control-group {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        select, input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .dialogue-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dialogue-controls button {
+            flex: 1;
+        }
+
+        #playBtn {
+            background: #48bb78;
+        }
+
+        #playBtn:hover {
+            background: #38a169;
+        }
+
+        #resetBtn {
+            background: #f56565;
+        }
+
+        #resetBtn:hover {
+            background: #e53e3e;
+        }
+
+        .current-step {
+            text-align: center;
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .speech-input {
+            min-height: 80px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="current-step" id="currentStep">Нажмите на экран для продолжения</div>
+        
+        <div class="preview-area" id="previewArea">
+            <img class="character character-left" id="characterLeft" src="" alt="Персонаж слева">
+            <img class="character character-right" id="characterRight" src="" alt="Персонаж справа">
+            
+            <div class="dialog-box dialog-box-left" id="dialogLeft">
+                <div class="dialog-text"></div>
+            </div>
+            
+            <div class="dialog-box dialog-box-right" id="dialogRight">
+                <div class="dialog-text"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <h2>Фоновая картинка</h2>
+                <select id="backgroundSelect">
+                    <option value="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800">Горы</option>
+                    <option value="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800">Леса</option>
+                    <option value="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800">Океан</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h2>Персонаж слева</h2>
+                <select id="leftCharacterSelect">
+                    <option value="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400">Мужчина 1</option>
+                    <option value="https://images.unsplash.com/photo-1567532939604-b6b5b0db1604?w=400">Женщина 1</option>
+                    <option value="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400">Мужчина 2</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h2>Персонаж справа</h2>
+                <select id="rightCharacterSelect">
+                    <option value="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400">Женщина 2</option>
+                    <option value="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400">Мужчина 3</option>
+                    <option value="https://images.unsplash.com/photo-1554151228-14d9def656e4?w=400">Женщина 3</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h2>Речь персонажа слева</h2>
+                <textarea class="speech-input" id="leftSpeech" placeholder="Введите реплику для левого персонажа..."></textarea>
+                <button onclick="addDialogue('left')">Добавить реплику слева</button>
+            </div>
+
+            <div class="control-group">
+                <h2>Речь персонажа справа</h2>
+                <textarea class="speech-input" id="rightSpeech" placeholder="Введите реплику для правого персонажа..."></textarea>
+                <button onclick="addDialogue('right')">Добавить реплику справа</button>
+            </div>
+
+            <div class="control-group">
+                <h2>Управление диалогом</h2>
+                <div class="dialogue-controls">
+                    <button id="playBtn" onclick="startDialogue()">▶ Воспроизвести</button>
+                    <button id="resetBtn" onclick="resetDialogue()">↺ Сбросить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Элементы DOM
+        const previewArea = document.getElementById('previewArea');
+        const characterLeft = document.getElementById('characterLeft');
+        const characterRight = document.getElementById('characterRight');
+        const dialogLeft = document.getElementById('dialogLeft');
+        const dialogRight = document.getElementById('dialogRight');
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        const leftCharacterSelect = document.getElementById('leftCharacterSelect');
+        const rightCharacterSelect = document.getElementById('rightCharacterSelect');
+        const leftSpeech = document.getElementById('leftSpeech');
+        const rightSpeech = document.getElementById('rightSpeech');
+        const currentStep = document.getElementById('currentStep');
+
+        // Данные приложения
+        let dialogue = [];
+        let currentDialogueIndex = 0;
+        let isDialogueActive = false;
+
+        // Инициализация
+        function init() {
+            updateBackground();
+            updateCharacters();
+            
+            // Обработчики событий
+            backgroundSelect.addEventListener('change', updateBackground);
+            leftCharacterSelect.addEventListener('change', () => updateCharacter('left'));
+            rightCharacterSelect.addEventListener('change', () => updateCharacter('right'));
+            previewArea.addEventListener('click', handleScreenClick);
+            
+            // Загрузка изображений по умолчанию
+            characterLeft.src = leftCharacterSelect.value;
+            characterRight.src = rightCharacterSelect.value;
+        }
+
+        // Обновление фона
+        function updateBackground() {
+            previewArea.style.backgroundImage = `url('${backgroundSelect.value}')`;
+        }
+
+        // Обновление персонажей
+        function updateCharacters() {
+            characterLeft.src = leftCharacterSelect.value;
+            characterRight.src = rightCharacterSelect.value;
+        }
+
+        function updateCharacter(side) {
+            if (side === 'left') {
+                characterLeft.src = leftCharacterSelect.value;
+            } else {
+                characterRight.src = rightCharacterSelect.value;
+            }
+        }
+
+        // Добавление реплики в диалог
+        function addDialogue(side) {
+            const text = side === 'left' ? leftSpeech.value : rightSpeech.value;
+            if (text.trim()) {
+                dialogue.push({ side, text });
+                alert(`Реплика добавлена! Всего реплик: ${dialogue.length}`);
+                if (side === 'left') leftSpeech.value = '';
+                else rightSpeech.value = '';
+            } else {
+                alert('Введите текст реплики!');
+            }
+        }
+
+        // Воспроизведение диалога
+        function startDialogue() {
+            if (dialogue.length === 0) {
+                alert('Добавьте хотя бы одну реплику!');
+                return;
+            }
+            
+            isDialogueActive = true;
+            currentDialogueIndex = 0;
+            showCurrentDialogue();
+        }
+
+        // Обработчик клика по экрану
+        function handleScreenClick() {
+            if (!isDialogueActive) return;
+            
+            currentDialogueIndex++;
+            if (currentDialogueIndex < dialogue.length) {
+                showCurrentDialogue();
+            } else {
+                endDialogue();
+            }
+        }
+
+        // Показать текущую реплику
+        function showCurrentDialogue() {
+            const current = dialogue[currentDialogueIndex];
+            
+            // Скрываем все диалоги
+            dialogLeft.classList.remove('active');
+            dialogRight.classList.remove('active');
+            
+            // Показываем нужный диалог
+            setTimeout(() => {
+                if (current.side === 'left') {
+                    dialogLeft.querySelector('.dialog-text').textContent = current.text;
+                    dialogLeft.classList.add('active');
+                    speakText(current.text);
+                } else {
+                    dialogRight.querySelector('.dialog-text').textContent = current.text;
+                    dialogRight.classList.add('active');
+                    speakText(current.text);
+                }
+                
+                currentStep.textContent = `Реплика ${currentDialogueIndex + 1} из ${dialogue.length}`;
+            }, 300);
+        }
+
+        // Озвучка текста
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 1.0;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Завершение диалога
+        function endDialogue() {
+            isDialogueActive = false;
+            dialogLeft.classList.remove('active');
+            dialogRight.classList.remove('active');
+            currentStep.textContent = 'Диалог завершен. Нажмите "Воспроизвести" для повторения.';
+            speechSynthesis.cancel();
+        }
+
+        // Сброс диалога
+        function resetDialogue() {
+            dialogue = [];
+            currentDialogueIndex = 0;
+            isDialogueActive = false;
+            dialogLeft.classList.remove('active');
+            dialogRight.classList.remove('active');
+            currentStep.textContent = 'Диалог сброшен. Добавьте новые реплики.';
+            speechSynthesis.cancel();
+        }
+
+        // Запуск приложения
+        init();
+    </script>
+</body>
+</html>
